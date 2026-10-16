@@ -2,26 +2,26 @@
 
 **Software Engineering | University Group Project**
 
-## 📌 Project Overview
+##  Project Overview
 
 This repository contains a university Software Engineering group project focused on the design and development of a medical clinic management system.
 
 The project combines software engineering principles, UML modelling, technical documentation, and Java development.
 
-## 🛠️ Technologies & Tools
+##  Technologies & Tools
 
 - **Java** — Application development
 - **UML** — Software system modelling
 - **Visual Paradigm** — Design and UML diagrams
 - **Git & GitHub** — Version control and team collaboration
 
-## 📁 Project Structure
+##  Project Structure
 
 - `JavaProject/Ambulatorio/` — Java project files
 - `Documentation/` — Project documentation
 - `VisualParadigm/` — Software modelling files
 
-## 👥 Team & Collaboration
+##  Team & Collaboration
 
 This project was developed collaboratively as part of a university Software Engineering examination.
 
