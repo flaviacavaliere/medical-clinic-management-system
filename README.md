@@ -186,8 +186,3 @@ This repository represents a university prototype rather than a production-ready
 
 Potential next steps include completing the remaining workflows, strengthening booking transaction handling, expanding test coverage, and packaging the application for easier installation.
 
-## Team and credits
-
-Developed for the **Software Engineering** course at the **University of Naples Federico II** by **Flavia Cavaliere, Carlo Cirillo, Francesca D'Ambra, and Pietro Farina**.
-
-This repository is my fork of the [original group repository](https://github.com/carlocirillo/Gruppo_IS_22), preserving the link to the team project and its development history.
