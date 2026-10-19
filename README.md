@@ -144,7 +144,11 @@ Docker Compose starts the **MySQL database container**; the Java application its
 
 On startup, the application can populate an empty database with sample data for development and demonstration.
 
-**Note:** A standalone executable JAR has not been verified. The current Maven configuration does not package a self-contained application with all the required dependencies and generated Swing forms.
+**Note:** The application was successfully developed, tested and demonstrated using IntelliJ IDEA as part of our university Software Engineering project.
+
+A standalone executable JAR was not created for the final submission, as the application was designed to run within the IDE, using Java Swing GUI Designer and a MySQL database.
+
+The project can be launched directly from IntelliJ IDEA by following the configuration steps above.
 
 ## Testing
 
