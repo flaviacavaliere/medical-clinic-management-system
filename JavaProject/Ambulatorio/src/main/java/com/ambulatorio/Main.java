@@ -22,6 +22,8 @@ public class Main {
         try {
             InizializzatoreDatabase inizializzatore = new InizializzatoreDatabase(gestore);
             inizializzatore.popolaDatiDiTest();
+            // Aggiorna le fasce prenotabili anche se il database era già popolato.
+            inizializzatore.generaDisponibilitaFuture();
         } catch (Exception e) {
             e.printStackTrace();
         }

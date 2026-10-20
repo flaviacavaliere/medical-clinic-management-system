@@ -6,8 +6,15 @@ import com.ambulatorio.entity.enums.Ruolo;
 import com.ambulatorio.entity.enums.StatoFascia;
 import com.ambulatorio.entity.enums.StatoPrenotazione;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class InizializzatoreDatabase {
 
@@ -294,6 +301,87 @@ public class InizializzatoreDatabase {
         gestore.salva(fasciaLibera);
 
         System.out.println("--- Dati fittizi inseriti con successo! ---");
+    }
+
+    /**
+     * Aggiunge fasce orarie dimostrative per i prossimi 30 giorni, solo nei giorni
+     * dal lunedì al venerdì. Non modifica le fasce esistenti né le prenotazioni
+     * (anche se effettuate, annullate o relative a date passate).
+     *
+     * Le fasce vengono controllate per medico, data e ora di inizio: avviando
+     * l'applicazione più volte non vengono create doppie disponibilità.
+     *
+     * Gli orari qui sotto sono una scelta dimostrativa, non un'agenda reale dei medici.
+     */
+    public void generaDisponibilitaFuture() {
+        LocalDate oggi = LocalDate.now();
+        LocalDate inizio = oggi.plusDays(1);
+        LocalDate fine = oggi.plusDays(30);
+
+        // Orari dimostrativi di 30 minuti, sia al mattino sia al pomeriggio.
+        LocalTime[] orariInizio = {
+                LocalTime.of(9, 0),
+                LocalTime.of(9, 30),
+                LocalTime.of(10, 0),
+                LocalTime.of(10, 30),
+                LocalTime.of(15, 0),
+                LocalTime.of(15, 30)
+        };
+
+        List<Medico> medici = gestore.cercaTutti(Medico.class);
+        List<FasciaOraria> nuoveFasce = new ArrayList<>();
+
+        for (Medico medico : medici) {
+            // Controlla le fasce esistenti, anche quelle occupate o annullate:
+            // una fascia già presente non deve essere ricreata con stato LIBERA.
+            List<FasciaOraria> fasceEsistenti = gestore.eseguiQueryCustom(
+                    FasciaOraria.class,
+                    "SELECT f FROM FasciaOraria f " +
+                            "WHERE f.medico.id = :idMedico " +
+                            "AND f.data BETWEEN :inizio AND :fine",
+                    Map.of("idMedico", medico.getId(), "inizio", inizio, "fine", fine)
+            );
+
+            Set<LocalDateTime> orariPresenti = new HashSet<>();
+            for (FasciaOraria fascia : fasceEsistenti) {
+                if (fascia.getData() != null && fascia.getOraInizio() != null) {
+                    orariPresenti.add(fascia.getData().atTime(fascia.getOraInizio()));
+                }
+            }
+
+            for (LocalDate data = inizio; !data.isAfter(fine); data = data.plusDays(1)) {
+                if (data.getDayOfWeek() == DayOfWeek.SATURDAY ||
+                        data.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                    continue;
+                }
+
+                for (LocalTime oraInizio : orariInizio) {
+                    LocalDateTime chiave = data.atTime(oraInizio);
+                    if (!orariPresenti.add(chiave)) {
+                        continue;
+                    }
+
+                    FasciaOraria fascia = new FasciaOraria();
+                    fascia.setMedico(medico);
+                    fascia.setData(data);
+                    fascia.setOraInizio(oraInizio);
+                    fascia.setOraFine(oraInizio.plusMinutes(30));
+                    fascia.setStato(StatoFascia.LIBERA);
+                    nuoveFasce.add(fascia);
+                }
+            }
+        }
+
+        if (nuoveFasce.isEmpty()) {
+            System.out.println("Disponibilità future già presenti: nessuna nuova fascia creata.");
+            return;
+        }
+
+        if (!gestore.salvaTutti(nuoveFasce.toArray())) {
+            throw new IllegalStateException("Errore nel salvataggio delle nuove disponibilità future.");
+        }
+
+        System.out.println("Nuove disponibilità future create: " + nuoveFasce.size());
     }
 
     /**
